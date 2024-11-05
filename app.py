@@ -1,19 +1,30 @@
-from flask import Flask, request
+from flask import Flask, request, render_template
 
 app = Flask(__name__)
 
 
 @app.route("/")
-def say_hello():
+def home():
     html = """
     <html>
-     <body>
-     <h1>Hello, World!</h1>
-      <p>This is the hello page.</p>
-     </body>
+       <body>
+            <h1>Welcome to my website!</h1>
+            <p>This is a simple website.</p>
+            <a href="/hello">Say Hello</a>
+        </body>
     </html>
-    """
+"""
     return html
+
+
+@app.route("/about")
+def about():
+    return "This is the about page"
+
+
+@app.route("/hello")
+def say_hello():
+    return render_template("hello.html")
 
 
 @app.route("/goodbye")
@@ -44,6 +55,7 @@ def add_comment_form():
     <h1>Add Comment Form</h1>
     <form method="POST">
         <input type="text" name="comment" placeholder="Enter your comment">
+        <input type="text" name="username" placeholder="Username">
         <button>Submit</button>
         </form>
     """
@@ -51,6 +63,32 @@ def add_comment_form():
 
 @app.route("/add-comment", methods=["POST"])
 def save_comment():
-    return """
-    <h1>Comment saved!</h1>
+    comment = request.form["comment"]
+    username = request.form["username"]
+    print(request.form)
+    return f"""
+        <h1>SAVED YOUR COMMENT</h1>
+        <ul>
+            <li>Comment: {comment}</li>
+            <li>Username: {username}</li>
+        </ul>
     """
+
+
+@app.route("/r/<subreddit>")
+def show_subbredit(subreddit):
+    return f"<h1>Browsing The {subreddit} Subreddit</h1>"
+
+
+POSTS = {
+    1: "I like chicken tenders",
+    2: "I love eating pizza",
+    3: "I hate spicy food",
+    4: "I am a vegetarian",
+}
+
+
+@app.route("/posts/<int:id>")
+def get_post(id):
+    post = POSTS[id]
+    return f"<h1>Post {id}</h1><p>{post}</p>"
